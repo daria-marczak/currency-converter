@@ -51,7 +51,7 @@ function convertCurrency(e) {
 
       givenAmount.innerHTML = inputAmount.val();
       baseCurrency.textContent = selectedInput + " = ";
-      finalAmount.textContent = Math.floor(total);
+      finalAmount.textContent = total.toFixed(2);
       finalCurrency.textContent = selectedOutput;
     }
   } else if (selectedInput == selectedOutput) {
