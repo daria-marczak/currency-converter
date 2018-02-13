@@ -1,40 +1,60 @@
-var inputAmount = document.getElementById("amount");
-var inputCurrency = document.getElementById("inputCurrency");
-var outputAmount = document.getElementById("output");
-var outputCurrency = document.getElementById("outputCurrency");
+var inputAmount = $("#amount");
+var inputCurrency = $("#inputDropdown");
+var outputAmount = $("#output");
+var outputCurrency = $("#outputDropdown");
 
-var button = document.getElementById("calculate");
+var button = $("#calculate");
 
-var xHttp = new XMLHttpRequest();
+var url = "https://api.fixer.io/latest";
 
-function loadCurrencies() {
-	xHttp.onreadystatechange = function() {
-		if(xHttp.readyState == 4 && xHttp.status == 200) {
-			var obj = JSON.parse(this.responseText);
-			var options = "";
-			for (key in obj.rates) {
-				options = options + "<option>" + key + "</option>";
-			}
-			inputCurrency.innerHTML = options;
-			outputCurrency.innerHTML = options;
-		}
-		xHttp.open("GET", "https://api.fixer.io/latest", true);
-		xHttp.send();
-	}
-}
+button.click(convertCurrency);
 
-function convertCurrency() {
-	if (inputCurrency.length > 0 && outputCurrency.length > 0 && amount > 0) {
-		xHttp.onreadystatechange = function() {
-			if(xHttp.readyState == 4 && xHttp.status == 200) {
-				var obj = JSON.parse(this.responseText);
-				var fact = parseFloat(obj.rates[inputCurrency]);
-				if (fact != undefined) {
-					result.innerHTML = parseFloat(amount)*fact;
-				}
-			}
-		}
-		xHttp.open("GET", "https://api.fixer.io/latest?base=" + inputCurrency.value + "&symbols=" + outputCurrency.value, true);
-		
-	}
+var request = new XMLHttpRequest();
+request.open("GET", url, true);
+request.onload = function() {
+  if (request.status === 200) {
+    console.log(request.response);
+  }
+};
+request.send();
+
+inputCurrency.append("<option selected='true' disabled>Choose currency</option>");
+outputCurrency.append("<option selected='true' disabled>Choose currency</option>");
+
+$.getJSON(url, function(data) {
+  console.log(data);
+  var rates = Object.keys(data.rates)
+    .concat([data.base])
+    .sort();
+  rates.forEach(function(key) {
+    inputCurrency.append($("<option>").attr("value", key).text(key));
+    outputCurrency.append($("<option>").attr("value", key).text(key));
+  });
+});
+
+
+function convertCurrency(e) {
+  e.preventDefault();
+  var selectedInput = inputDropdown.options[inputDropdown.selectedIndex]     .value;
+  var selectedOutput = outputDropdown.options[outputDropdown.selectedIndex]
+    .value;
+  console.log(selectedInput);
+  console.log(selectedOutput);
+  if (selectedInput !== 0 && selectedOutput !== 0 && selectedInput !== selectedOutput) {
+    $.ajax({
+      url: url + "?base=" + selectedInput + "&symbols=" + selectedOutput,
+      method: "GET",
+      success: convert
+    });
+    function convert(data) {
+      var total = inputAmount.val() * data.rates[selectedOutput];
+
+      givenAmount.innerHTML = inputAmount.val();
+      baseCurrency.textContent = selectedInput + " = ";
+      finalAmount.textContent = Math.floor(total);
+      finalCurrency.textContent = selectedOutput;
+    }
+  } else if (selectedInput == selectedOutput) {
+    alert("Please do not try to convert the currency to the currency itself");
+  }
 }
