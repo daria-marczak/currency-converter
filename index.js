@@ -55,6 +55,6 @@ function convertCurrency(e) {
       finalCurrency.textContent = selectedOutput;
     }
   } else if (selectedInput == selectedOutput) {
-    alert("Please do not try to convert the currency to the currency itself");
+    alert("Please select two different currencies");
   }
 }
