@@ -4,8 +4,9 @@ var outputAmount = $("#output");
 var outputCurrency = $("#outputDropdown");
 
 var button = $("#calculate");
+var api_key = "90ae500eada8f8eb3cb22e64174c56cb";
 
-var url = "https://api.fixer.io/latest";
+var url = `http://data.fixer.io/api/latest?access_key=${api_key}`;
 
 button.click(convertCurrency);
 
